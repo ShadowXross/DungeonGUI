@@ -127,6 +127,7 @@ public class KeyboardAnimation implements ActionListener
 			//DungeonGUI_Grid.hideEnemy(true);
 			timer.start();
 			DungeonGUI_Grid.reappear();
+			System.out.println("Test");
 			//DungeonGUI_Grid.continueThread();
 		}
 		if(r1.getX() > (r3.getX() + 135))
