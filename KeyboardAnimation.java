@@ -2,6 +2,7 @@ package GridGUI;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import javax.swing.*;
@@ -99,26 +100,47 @@ public class KeyboardAnimation implements ActionListener
 	{
 		Rectangle r1 = new Rectangle(component.getBounds());
 		Rectangle r2 = new Rectangle(DungeonGUI_Grid.getEnemy().dimen());
-		Rectangle r3 = new Rectangle(DungeonGUI_Grid.getDoor().dimen());
-		
+		Rectangle r3 = new Rectangle(DungeonGUI_Grid.getDoor().getBounds());
+		//System.out.println(r1);
+		//System.out.println(r3.getX());
 		if((r2.getX() - 82) < r1.getX() && r1.getX() < (r2.getX() + 82))
 		{
-			DungeonGUI_Grid.pauseState();
+			//DungeonGUI_Grid.pauseState();
+			timer.stop();
+			// to set background to disappear you would need an instance therefore would require the menu
 			while(state)
 			{
-			BattleGUI_Controller test = new BattleGUI_Controller();
-			battleOver = test.gameOver;
+				
+				try {
+					Battle_MVC test = new Battle_MVC();
+					battleOver = test.state;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			state = false;
 			}
 		}
 		if (battleOver)
 		{
-			DungeonGUI_Grid.continueThread();
+			DungeonGUI_Grid.hideEnemy(true);
+			timer.start();
+			//DungeonGUI_Grid.continueThread();
 		}
-		if(r1.getX() == (r3.getX() - 3))
+		if(r1.getX() > (r3.getX() + 135))
 		{
 			//DungeonGUI_Grid.pauseState();
-			System.out.println("FREEDOM !!!!");	
+			timer.stop();
+			String message = "Thanks for playing \n Would you like to stay for more?";
+			int reply = JOptionPane.showConfirmDialog(null, message, "Exit", JOptionPane.YES_NO_OPTION);
+	        if (reply == JOptionPane.YES_OPTION) {
+	          JOptionPane.showMessageDialog(null, "Yay, thanks for staying but leave now");
+	        }
+	        else {
+	           JOptionPane.showMessageDialog(null, "It was nice while it lasted");
+	           System.out.println("FREEDOM !!!!");
+	           System.exit(0);
+	        }	
 		}
 	}
 	

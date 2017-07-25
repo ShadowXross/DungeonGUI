@@ -19,8 +19,9 @@ public class DungeonGUI_Grid extends JFrame {
 	BackGroundPane contentPane;
 	static makeChar hero;
 	static makeChar enemy;
-	static makeChar door;
+	static JLabel door;
 	private final static GameState gamestate = new GameState(false);
+	private static boolean state = true;
 	
 	public DungeonGUI_Grid() throws IOException
 	{
@@ -44,7 +45,7 @@ public class DungeonGUI_Grid extends JFrame {
 		this.pack();
 		
 		// 5. Show it
-		this.setVisible(true);
+		this.setVisible(state);
 		gamestate.start();
 
 	}
@@ -61,8 +62,13 @@ public class DungeonGUI_Grid extends JFrame {
 		hero = new makeChar(heroImg);
 		ImageIcon enemyImg = new ImageIcon(this.getClass().getResource("/boss_skele.gif"));
 		enemy = new makeChar(enemyImg);
+		
+		//requires seperate scaling
 		ImageIcon doorImg = new ImageIcon(this.getClass().getResource("/Door.png"));
-		door = new makeChar(doorImg);
+		Image doorImage = doorImg.getImage();
+		Image newFileImg = doorImage.getScaledInstance((int) (1024 / 3), 1000, java.awt.Image.SCALE_DEFAULT);
+		doorImg = new ImageIcon(newFileImg);
+		door = new JLabel(doorImg);
 		
 		
 		// Add animation to JLabel 
@@ -79,7 +85,8 @@ public class DungeonGUI_Grid extends JFrame {
 	    c = makeGbc(4,0);
 		contentPane.add(enemy.Sprite, c);
 		c = makeGbc(5,0);
-		contentPane.add(door.Sprite, c);
+		contentPane.add(door, c);
+		
 		
 		// Add to JPanel with back ground
 		this.getContentPane().add(contentPane);
@@ -114,9 +121,9 @@ public class DungeonGUI_Grid extends JFrame {
 		enemy.Sprite.setVisible(!flag);
 	}
 	
-	protected static makeChar getDoor()
+	protected static JLabel getDoor()
 	{
-		makeChar doorCopy = door;
+		JLabel doorCopy = door;
 		return doorCopy;
 	}
 	
@@ -136,7 +143,10 @@ public class DungeonGUI_Grid extends JFrame {
 		enemy.Sprite.setVisible(false);
 	}
 	
-	
+	protected static void disappear()
+	{
+		state = false;
+	}
 			
 	//=================================================================================================
 	
