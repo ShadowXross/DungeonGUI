@@ -21,10 +21,11 @@ public class DungeonGUI_Grid extends JFrame {
 	static makeChar enemy;
 	static JLabel door;
 	private final static GameState gamestate = new GameState(false);
-	private static boolean state = true;
+	private static DungeonGUI_Grid game;
 	
 	public DungeonGUI_Grid() throws IOException
 	{
+		
 		// 1. Construct JFrame
 		super();
 		String filename = "/Dungeon_Background_49.png";
@@ -45,8 +46,7 @@ public class DungeonGUI_Grid extends JFrame {
 		this.pack();
 		
 		// 5. Show it
-		this.setVisible(state);
-		gamestate.start();
+		//gamestate.start();
 
 	}
 	
@@ -140,19 +140,24 @@ public class DungeonGUI_Grid extends JFrame {
 	protected static void continueThread()
 	{
 		gamestate.resumeThread();
-		enemy.Sprite.setVisible(false);
 	}
 	
 	protected static void disappear()
 	{
-		state = false;
+		game.setVisible(false);
+	}
+	
+	protected static void reappear()
+	{
+		game.setVisible(true);
 	}
 			
 	//=================================================================================================
 	
 	public static void main(String[] args) throws IOException
 	{
-		new DungeonGUI_Grid();
+		game = new DungeonGUI_Grid();
+		game.setVisible(true);
 	}
 	
 }

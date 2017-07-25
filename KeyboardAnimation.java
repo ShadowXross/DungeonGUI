@@ -16,7 +16,7 @@ public class KeyboardAnimation implements ActionListener
 	private Timer timer;
 	private Map<String, Point> pressedKeys = new HashMap<String, Point>();
 	private boolean state = true;
-	private boolean battleOver = false;
+	private boolean battleOver;
 
 
 	public KeyboardAnimation(JComponent component, int delay)
@@ -108,12 +108,13 @@ public class KeyboardAnimation implements ActionListener
 			//DungeonGUI_Grid.pauseState();
 			timer.stop();
 			// to set background to disappear you would need an instance therefore would require the menu
+			DungeonGUI_Grid.disappear();
 			while(state)
 			{
 				
 				try {
-					Battle_MVC test = new Battle_MVC();
-					battleOver = test.state;
+					Battle_MVC battle = new Battle_MVC();
+					battleOver = battle.state;
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -123,8 +124,9 @@ public class KeyboardAnimation implements ActionListener
 		}
 		if (battleOver)
 		{
-			DungeonGUI_Grid.hideEnemy(true);
+			//DungeonGUI_Grid.hideEnemy(true);
 			timer.start();
+			DungeonGUI_Grid.reappear();
 			//DungeonGUI_Grid.continueThread();
 		}
 		if(r1.getX() > (r3.getX() + 135))

@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TreeMap;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import BattleCommands.Ability;
 import BattleCommands.BattleCommand;
@@ -144,6 +145,7 @@ public class BattleModel {
     private void updateOnSuccessfulEvent(Hero actingHero)
     {
     	controller.sendUpdateEndOfTurnSignal(actingHero);
+    	controller.addActionListenersAI_Turn();
 		gameQueue.add(actingHero);
 		checkBattleStatus(); 	
     }
@@ -270,6 +272,7 @@ public class BattleModel {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+	        		  
 	        		  System.out.println("****************************************************");
 	        		  System.out.println("Current AI health: " + currentHero.getHealth());
 	        		  
@@ -291,8 +294,6 @@ public class BattleModel {
 	        				  controller.signalDisplayAbilityUsed(currentHero, AI_ability);
 	        			  }
 	        			  controller.signalRemoveArrow(currentHero);
-	        			  // TODO add animations to items, then good
-//	        			  controller.animateHeal(currentHero);
 	        		  }
 	        		  try {
 							BattleState.sleep(DISPLAY_SLEEP_TIME);
@@ -406,6 +407,21 @@ public class BattleModel {
     		{
     			
     		}
+    	} 
+    }
+    
+    /*********************************************************************************************************/
+    /*********************************************************************************************************/
+    /*********************************************************************************************************/
+    public class AI_Turn_Listener implements ActionListener {
+        
+    	public AI_Turn_Listener()
+    	{
+   
+    	}
+    	
+        public void actionPerformed(ActionEvent e) {
+        	controller.AI_Turn_Error();
     	} 
     }
     

@@ -2,6 +2,8 @@ package GridGUI;
 
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -10,6 +12,7 @@ import javax.swing.JPopupMenu;
 import BattleCommands.BattleCommand;
 import Heros.Hero;
 import PartyContainers.*;
+import RPG_Exceptions.MaximumStatException;
 
 
 public class BattleController{
@@ -187,6 +190,21 @@ public class BattleController{
     	}
     }
     
+    public void AI_Turn_Error()
+    {
+    	JOptionPane.showMessageDialog(view,"Wait your turn!", "Not Your Turn", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    /**********************************************************************/
+    
+    public void addActionListenersAI_Turn()
+    {
+    	for(int i = 0; i < 4; i ++)
+		{
+    		view.setAbilityListener(i, model.new AI_Turn_Listener());
+		}
+    }
+    
     /**********************************************************************/
     
     public void changeButtonNamesAndCmds(Hero hero)
@@ -226,8 +244,10 @@ public class BattleController{
     
     public void theEnd ()
     {
-    	view.setVisible(false);
-    	view.dispose();
+        view.setVisible(false);
+        view.dispose();
+        System.out.println("The battle is over");
     }
     
+    /**********************************************************************/
 }
