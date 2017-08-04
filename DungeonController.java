@@ -1,46 +1,61 @@
-package GridGUI;
-
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+package DungeonMVC;
 
 import javax.swing.JComponent;
 
+/**The controller for the Dungeon Veiw and Model
+ * Passes signals between view and model enabling proper MVC architecture
+ * 
+ * @author Anton Thomas
+ *
+ */
 public class DungeonController {
 
+	/**The DungeonView is the view within the MVC */
 	private DungeonView view;
+	/**Signify the end of the battle encounter	 */
 	boolean battleOver;
 	
+	/**Simple constructor that sets the Dungeon view
+	 * @param view
+	 */
 	public DungeonController(DungeonView view)
 	{
 		this.view = view;
 	}
 	
-	public void signalSwitchView()
+	/**Begins the battle, Should trigger on collision of Hero with Enemy
+	 * 
+	 */
+	public void signalStartBattle()
 	{
-		view.switchView();
+		view.startBattleView();
 	}
 	
+	/**
+	 * Causes the view to switch to Main Menu, Should occur on loss in battle or collision with door
+	 */
+	public void signalSendToMainMenu()
+	{
+		view.switchToMainMenu();
+	}
+	
+	/**Moves the Hero around the screen
+	 * 
+	 * @param component
+	 * @param nextX
+	 * @param nextY
+	 */
 	public void signalMoveComponent(JComponent component, int nextX, int nextY)
 	{
-		//  Move the component
 		view.moveComponent(component, nextX, nextY);
 	}
 	
-	public void hideChest()
+	/**Hides the chest once its been looted
+	 * 
+	 */
+	public void signalHideChest()
 	{
-		
-		GridBagLayout lay = (GridBagLayout) view.getLayout();
-		GridBagConstraints che = lay.getConstraints(view.chest.Sprite);
-		view.hideChest(true);
-		view.remove(DungeonView.chest.Sprite);
-		view.remove(DungeonView.hero.Sprite);
-		GridBagConstraints gbc = view.makeGbc(0,0);
-		view.add(view.chestHidden.Sprite,gbc);
-		view.add(view.hero.Sprite, che);
-		
-		
-		view.repaint();
-		view.revalidate();
+		view.chestOpened();
 	}
 	
 }

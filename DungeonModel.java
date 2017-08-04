@@ -1,10 +1,15 @@
-package GridGUI;
+package DungeonMVC;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import javax.swing.*;
 
+/**Controls the movement of the Hero and tests for collision instances, implements ActionListener Class for keyboard controls
+ * 
+ * @author Anton Thomas, Kevin Joseph
+ *
+ */
 public class DungeonModel implements ActionListener
 {
 	private final static String PRESSED = "pressed ";
@@ -16,15 +21,23 @@ public class DungeonModel implements ActionListener
 	private DungeonController controller;
 	private boolean looted = false;
 	
+	/**The Constructor which initializes the model and gives control over the hero object
+	 * 
+	 * @param component The Hero object that gets passed from the View
+	 * @param delay
+	 * @param controller sets the controller
+	 */
 	public DungeonModel(JComponent component, int delay, DungeonController controller)
 	{
 		this.component = component;
 		timer = new Timer(delay, this);
 		timer.setInitialDelay( 0 );
 		this.controller = controller;
+		DungeonModel.battleOver = false;
 	}
 
-	/*
+	/**Adds actions to the keystrokes makes use of Hidden Inner class
+	 * 
 	*  @param keyStroke - see KeyStroke.getKeyStroke(String) for the format of
 	*                     of the String. Except the "pressed|released" keywords
 	*                     are not to be included in the string.
@@ -61,6 +74,11 @@ public class DungeonModel implements ActionListener
 
 	//  Invoked whenever a key is pressed or released
 
+	/**Handles the event from the pressing of the arrow keys to control the component
+	 * 
+	 * @param key
+	 * @param moveDelta
+	 */
 	private void handleKeyEvent(String key, Point moveDelta)
 	{
 		//  Keep track of which keys are pressed
@@ -94,15 +112,15 @@ public class DungeonModel implements ActionListener
 		if(!looted)
 			checkChestCollision();
 		if(!battleOver)
-		{
 			checkEnemyCollisions();
-		}
 		if(battleOver)
-		{
-		checkDoorCollisions();
-		}
+			checkDoorCollisions();
 	}
 
+	/**Computes and returns the current and next co-ordinates of the component
+	 * 
+	 * @return new Co-ordinates of the component
+	 */
 	public int[] computeNewCoordinates()
 	{
 		int componentWidth = component.getSize().width;
@@ -145,6 +163,10 @@ public class DungeonModel implements ActionListener
 		return newCoords;
 	}
 	
+	/**Test collision between the Hero and the enemy
+	 * Stops the timer and informs controller to change views
+	 * 
+	 */
 	private void checkEnemyCollisions() 
 	{
 		Rectangle r1 = new Rectangle(component.getBounds());
@@ -153,11 +175,15 @@ public class DungeonModel implements ActionListener
 		{
 			timer.stop();
 			// to set background to disappear you would need an instance therefore would require the menu
-			controller.signalSwitchView();
+			controller.signalStartBattle();
 			return;
 		}
 	}
 	
+	/**Check for collision with chest, 
+	 * on collision cause popup with the gained items and hide chest
+	 * 
+	 */
 	protected void checkChestCollision()
 	{
 		Rectangle r1 = new Rectangle(component.getBounds());
@@ -166,17 +192,19 @@ public class DungeonModel implements ActionListener
 		{
 			timer.stop();
 			JOptionPane.showMessageDialog(null, "You Found \nAbilityPoints Potion x1\nAntidote x1\nHealth Potion x1", "Golden Chest", JOptionPane.WARNING_MESSAGE);
+			soundEffectControl.SoundClipPlayer.playSound("/Inventory.wav");
 			looted  = true;
-			controller.hideChest();
+			controller.signalHideChest();
 		}
 	}
 	
+	/**Check collision with door,
+	 * On collision cause a popup to inform player of choice to leave and act on the chosen option
+	 */
 	private void checkDoorCollisions()
 	{
 		Rectangle r1 = new Rectangle(component.getBounds());
 		Rectangle r3 = new Rectangle(DungeonView.getDoor().getBounds());
-		System.out.println(r3.getX());
-		System.out.println(r1);
 		if(r1.getX() > (r3.getX()+136))
 		{
 			timer.stop();
@@ -184,12 +212,11 @@ public class DungeonModel implements ActionListener
 			int reply = JOptionPane.showConfirmDialog(null, message, "Exit", JOptionPane.YES_NO_OPTION);
 	        if (reply == JOptionPane.YES_OPTION) {
 	          JOptionPane.showMessageDialog(null, "Freedom of choice is an illusion");
-	          System.exit(0);
+	          controller.signalSendToMainMenu();
 	        }
 	        else {
 	           JOptionPane.showMessageDialog(null, "It was nice while it lasted");
-	           System.out.println("FREEDOM !!!!");
-	           System.exit(0);
+	           controller.signalSendToMainMenu();
 	        }	
 		}
 	}
@@ -197,11 +224,16 @@ public class DungeonModel implements ActionListener
 	//  Action to keep track of the key and a Point to represent the movement
 	//  of the component. A null Point is specified when the key is released.
 
+	/**Hidden inner Helper class to recognize and act on events fired by key-press */
 	@SuppressWarnings("serial")
 	private class AnimationAction extends AbstractAction implements ActionListener
 	{
 		private Point moveDelta;
 
+		/**Constructor calls to super from implementation of Action Listener
+		 * @param key
+		 * @param moveDelta
+		 */
 		public AnimationAction(String key, Point moveDelta)
 		{
 			super(key);
@@ -215,6 +247,9 @@ public class DungeonModel implements ActionListener
 		}
 	}
 	
+	/**Signify to controller the battle has ended
+	 * @param battleOver
+	 */
 	public static void setBattleOver(boolean battleOver)
 	{
 		DungeonModel.battleOver = battleOver;

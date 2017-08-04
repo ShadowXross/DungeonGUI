@@ -1,4 +1,4 @@
-package GridGUI;
+package DungeonMVC;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,21 +11,26 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import HallOfBonesMain.GameView;
+import GridGUI.GameView;
+import GridGUI.GameViewPanel;
 import HallOfBonesMain.HallOfBonesMain;
 
+/**Dungeon View class to create and maintain the Dungeon View of the game
+ * Also interacts with Main Menu and Battle to ensure seamless interaction
+ * @author Anton Thomas, Kevin Joseph
+ */
 @SuppressWarnings("serial")
 public class DungeonView extends JPanel implements GameView{
 
 	//===========================================================================================
+	public static final String ACTIVITY_MUSIC = "/JonCJG_TheDemonstration.wav"; 
 	
 	GameViewPanel contentPane;
-	public static DungeonChar hero;
+	public DungeonChar hero;
 	public static DungeonChar enemy;
-	protected static DungeonChar chest;
+	private static DungeonChar chest;
 	static JLabel door;
-	private static JLabel doorHidden;
-	protected static DungeonChar chestHidden;
+	protected DungeonChar chestHidden;
 	static DungeonChar deadEnemy;
 	
 	private Image background;
@@ -36,15 +41,25 @@ public class DungeonView extends JPanel implements GameView{
     private HallOfBonesMain mainJFrame;
 	
     
+	/**Create and initialize the dungeon view
+	 * 
+	 * @param background
+	 * @param mainJFrame
+	 * @throws IOException
+	 */
 	public DungeonView(Image background, HallOfBonesMain mainJFrame) throws IOException
 	{
 		super.setLayout(new GridBagLayout());
 		this.background = background;    
 		this.mainJFrame = mainJFrame;
+		displayedOnce = false;
 	}
 	
 	//===========================================================================================
 	
+	/**Create animation pane to hold all aspects of the dungeon view(All the JPanels)
+	 * @throws IOException
+	 */
 	public void createAnimationPane() throws IOException
 	{
 
@@ -69,13 +84,7 @@ public class DungeonView extends JPanel implements GameView{
 		Image newDoorImg = doorImage.getScaledInstance((int) (1024 / 3), 1000, java.awt.Image.SCALE_DEFAULT);
 		doorImg = new ImageIcon(newDoorImg);
 		door = new JLabel(doorImg);
-		door.setVisible(false);
-		
-		ImageIcon doorHiddenImg = new ImageIcon(this.getClass().getResource("/Door_hidden.png"));
-		Image doorHiddenImage = doorHiddenImg.getImage();
-		Image newDoorHiddenImg = doorHiddenImage.getScaledInstance((int) (1024 / 3), 1000, java.awt.Image.SCALE_DEFAULT);
-		doorHiddenImg = new ImageIcon(newDoorHiddenImg);
-		doorHidden = new JLabel(doorHiddenImg);
+		door.setVisible(true);
 		
 		// Add animation to JLabel 
 		DungeonModel animation = new DungeonModel(hero.Sprite, 24, controller);
@@ -85,20 +94,25 @@ public class DungeonView extends JPanel implements GameView{
 		// Add characters to layout
 		GridBagConstraints c = makeGbc(0,0);
 		this.add(hero.Sprite, c);
-		 c = makeGbc(1,0);
-		 this.add(chest.Sprite, c);
-		 this.add(chestHidden.Sprite, c);
+		c = makeGbc(1,0);
+		this.add(chest.Sprite, c);
+		this.add(chestHidden.Sprite, c);
 	    c = makeGbc(2,0);
 		this.add(enemy.Sprite, c);
 		this.add(deadEnemy.Sprite, c);
 		c = makeGbc(3,0);
 		this.add(door, c);
-		this.add(doorHidden, c);
 		
 		revalidate();
 		repaint();
 	}
 	
+	/**Class to create uniform Gridbag layout constraints for the dungeon view
+	 * 
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public GridBagConstraints makeGbc(int x, int y)
 	{
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -115,40 +129,59 @@ public class DungeonView extends JPanel implements GameView{
     	return gbc;
 	}
 	
+	/**Getter for the enemy sprite
+	 * Returns deep copy of enemy object
+	 * @return enemyCopy
+	 */
 	public static DungeonChar getEnemy()
 	{
 		DungeonChar enemyCopy = enemy;
 		return enemyCopy;
 	}
 	
+	/**Getter for the chest sprite
+	 * Returns deep copy of the chest object
+	 * @return chestCopy
+	 */
 	public static DungeonChar getChest() {
 		
 		DungeonChar chestCopy = chest;
 		return chestCopy;
 	}
 	
+	/**Setter to control visibility of enemy and replace with dead enemy sprite
+	 * @param flag
+	 */
 	static void hideEnemy(Boolean flag)
 	{
 		enemy.Sprite.setVisible(!flag);
 		deadEnemy.Sprite.setVisible(flag);
 	}
 	
-	protected static void hideChest(Boolean flag)
+	/**Setter to control visibility of chest and replace with hidden sprite
+	 * @param flag
+	 */
+	protected void hideChest(Boolean flag)
 	{
 		chest.Sprite.setVisible(!flag);
 		chestHidden.Sprite.setVisible(flag);
 	}
 	
+	/**Getter for door sprite
+	 * Returns deep copy of the door object
+	 * @return
+	 */
 	public static JLabel getDoor()
 	{
 		JLabel doorCopy = door;
 		return doorCopy;
 	}
 	
-	public static void revealDoor(Boolean flag) {
-		doorHidden.setVisible(!flag);
+	/**Setter for the visibility of the door
+	 * @param flag
+	 */
+	public void revealDoor(Boolean flag) {
 		door.setVisible(flag);
-		
 	}
 	
 	 @Override
@@ -167,37 +200,74 @@ public class DungeonView extends JPanel implements GameView{
    
     }
 	
+    /** Control the location of the Hero Sprite from the controller
+     * 
+     * @param component
+     * @param x
+     * @param y
+     */
     public void moveComponent(JComponent component, int x, int y)
     {
     	component.setLocation(x, y);
     }
     
-    public void switchView()
+    /**Signal for Main frame to switch to battle view
+     * 
+     */
+    public void startBattleView()
     {
     	mainJFrame.switchViews(this, "battle");
     }
     
+    /** Signal for Main frame to switch to Main Menu */
+    public void switchToMainMenu()
+    {
+    	try {
+			mainJFrame.resetOnLoss();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	mainJFrame.switchViews(this, "mainMenu");
+    }
+    
+    /**Repaint the view once chest has been accessed,
+     * ensuring the current positions of Sprites on screen other than chest
+     * 
+     */
+    public void chestOpened()
+    {
+    	GridBagLayout lay = (GridBagLayout) this.getLayout();
+		GridBagConstraints che = lay.getConstraints(chest.Sprite);
+		this.hideChest(true);
+		this.remove(chest.Sprite);
+		this.remove(hero.Sprite);
+		GridBagConstraints gbc = this.makeGbc(0,0);
+		this.add(chestHidden.Sprite,gbc);
+		this.add(hero.Sprite, che);
+	
+		repaint();
+		revalidate();
+    }
     public void startView()
     {
+    	soundEffectControl.SoundClipPlayer.shutUp();
+    	soundEffectControl.SoundClipPlayer.playLoopingSound(ACTIVITY_MUSIC);
     	if(displayedOnce)
 		{
-        	//DungeonView.hideChest(true);
     		GridBagLayout lay = (GridBagLayout) mainJFrame.dungeonView.getLayout();
     		GridBagConstraints ene = lay.getConstraints(DungeonView.deadEnemy.Sprite);
-    		mainJFrame.dungeonView.remove(DungeonView.enemy.Sprite);
-    		mainJFrame.dungeonView.remove(DungeonView.hero.Sprite);
+    		mainJFrame.dungeonView.remove(enemy.Sprite);
+    		mainJFrame.dungeonView.remove(hero.Sprite);
     		GridBagConstraints gbc = makeGbc(0,0);
-    		mainJFrame.dungeonView.add(DungeonView.chestHidden.Sprite,gbc);
-    		mainJFrame.dungeonView.add(DungeonView.hero.Sprite, ene);
+    		mainJFrame.dungeonView.add(chestHidden.Sprite,gbc);
+    		mainJFrame.dungeonView.add(hero.Sprite, ene);
     		mainJFrame.dungeonView.repaint();
     		mainJFrame.dungeonView.revalidate();
     		DungeonView.hideEnemy(true);
-    		DungeonView.revealDoor(true);
     		mainJFrame.dungeonView.setComponentZOrder(door, 1);
     		mainJFrame.dungeonView.setComponentZOrder(deadEnemy.Sprite, 1);
     		mainJFrame.dungeonView.setComponentZOrder(chestHidden.Sprite, 2);
     		mainJFrame.dungeonView.setComponentZOrder(hero.Sprite, 0);
-    		
 			repaint();
 			revalidate();
 		}
